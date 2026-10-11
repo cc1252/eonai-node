@@ -1,0 +1,8 @@
+Wokey Provider Node
+Copyright 2026 Wokey
+
+This product includes open source software listed in package-lock.json.
+
+Source: focuxdot/wokey-provider-node 0.1.100, commit 349fa06a32f12e1c18f71dcd7ef409726c649300.
+The TypeScript files in vendor/official-exit/ are unmodified copies; dist/official-exit.mjs
+is an esbuild compilation of them.

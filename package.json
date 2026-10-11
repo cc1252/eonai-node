@@ -1,0 +1,14 @@
+{
+  "name": "eonai-supplier-node",
+  "version": "0.4.3",
+  "private": false,
+  "type": "module",
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "dependencies": {
+    "jose": "6.2.12",
+    "ws": "8.21.1"
+  },
+  "license": "Apache-2.0"
+}
