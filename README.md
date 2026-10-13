@@ -1,4 +1,4 @@
-# EonAI 供应节点（v0.4.3）
+# EonAI 供应节点（v0.4.4）
 
 ## 已实现的接入方式
 
@@ -17,7 +17,7 @@
    - 撤销与本机共用的授权时，平台只清除自己的副本，不在官方处注销，本机登录保持有效。
 7. Claude、Grok、Kimi：在在线节点点击对应厂商，Claude 使用官方授权码，Grok/Kimi 使用设备码；也可以主动选择对应登录 JSON，或执行 `node node.mjs import-subscription anthropic /path/to/credentials.json [credential-id]`（Grok 用 `xai`、Kimi 用 `moonshot`）。Kimi 中国与国际账号分开，首次导入国际账号用 `node node.mjs import-subscription moonshot /path/to/auth.json - global`。
 8. API Key：工作台主动选择只含 Key 的文本文件，选择厂商与接口类型；也可执行 `node node.mjs import-key openai /path/to/key.txt`。共 13 家固定预设：OpenAI、Anthropic、xAI、Moonshot、Qwen、智谱、MiniMax、MiMo、DeepSeek、Ollama Cloud、Google Gemini、火山方舟、OpenCode Go。Moonshot/智谱 Coding 用 `coding`，MiMo Token Plan 用 `token-cn`、`token-sgp` 或 `token-ams`。成功后可删除原始 Key 文件。
-9. 在工作台刷新凭据列表，订阅或 Key 点击“查看可用模型”选择账号实际模型；提交输入/输出供应价（USD / 百万 Token）。管理员确认模型能力与零售价后上架。
+9. 在工作台刷新凭据列表，订阅或 Key 点击“查看可用模型”选择账号实际模型；提交输入/输出供应价（人民币 / 百万 Token）。零售价自动按供应价上浮 50%，管理员确认模型能力后上架。
 
 节点主动连接 `wss://api.eonaibusiness.com/internal/provider/connect`，无需开放入站端口。节点身份默认保存到 `~/.eonai-node/identity.json`；可用 `EONAI_NODE_HOME` 修改存放目录。身份文件相当于节点访问凭证，请勿分享。平台拒绝重复绑定码、无效身份、已暂停或已撤销的节点。
 
@@ -45,17 +45,17 @@ Linux/macOS 上身份文件设为 0600。Windows 的 chmod 无法代替 NTFS ACL
 - 首版只支持非流式文字请求；`stream: true`、图片、视频、文件、工具、后台任务、显式缓存写入均被拒绝。
 - Codex 订阅只使用 Responses：当前适配不接收 max_output_tokens/max_tokens、temperature 等额外参数，明确报错，不会悄悄丢弃输出限制。按成功响应的实际用量计费。
 
-供应节点通道由 New API 执行客户认证、额度扣减与记录。客户直接在普通 `/v1/…` 路径选择供应节点模型会被拒绝，避免绕过独立入口的请求关联检查。
+供应节点通道由 EonAI 计费网关 执行客户认证、额度扣减与记录。客户直接在普通 `/v1/…` 路径选择供应节点模型会被拒绝，避免绕过独立入口的请求关联检查。
 
 本系统不会主动测试生成视频或其他计费内容。管理员连接检查仅发送无凭据 HEAD 请求。订阅导入、模型查询与上架审核会使用授权凭据读取官方账号资料和模型目录；这些操作不生成内容，也不等同于推理已成功。
 
 ## 贡献、收益和结算
 
-平台不保存提示词或回答正文。成功响应会产生交付记录，随后与 New API 的真实消费日志按请求 ID、通道和模型进行逐项核对。只有唯一、成功且实际计费的日志才可确认收益；失败不计收益，异常保留待复核。输入/输出供应价按核对日志中的对应 Token 数计算，USD 微单位记账，幂等结算。未核对的交付不能提现。
+平台不保存提示词或回答正文。成功响应会产生交付记录，随后与 EonAI 计费网关 的真实消费日志按请求 ID、通道和模型进行逐项核对。只有唯一、成功且实际计费的日志才可确认收益；失败不计收益，异常保留待复核。输入/输出供应价按核对日志中的对应 Token 数计算，USD 微单位记账，幂等结算。未核对的交付不能提现。
 
 平台用 Ed25519 签名贡献凭据。它是**平台账本记录**，不是 Nitro 硬件证明，不证明模型权重或模型纯度。本站已有的专用文字验证通道保持独立。
 
-最低申请结算 $1。申请后冻结金额，管理员完成外部付款后登记真实凭证；驳回会解冻。收益来自已确认的实际调用，付款由管理员人工处理。
+最低申请结算金额按当前人民币换算价显示（当前为 ¥6.7094）。申请后冻结金额，管理员完成外部付款后登记真实凭证；驳回会解冻。收益来自已确认的实际调用，付款由管理员人工处理。
 
 ## 开源与许可
 
@@ -71,7 +71,7 @@ Linux/macOS 上身份文件设为 0600。Windows 的 chmod 无法代替 NTFS ACL
 
 工作台分别展示 Codex 接入与备用注册应用 OAuth 状态。Codex 使用公开 Codex 协议及用户主动授予的账号凭据，其客户端标识不能作为本站独立应用登记或商业许可证明。合成样本测试不代表生产订阅账号已授权；实际使用需供应商完成自己的账号授权，模型、额度与上游准入以官方账号实际结果为准。
 
-Codex 上游使用 `chatgpt.com/backend-api/codex/responses`；备用注册应用授权使用公共 `/v1/responses`。两者均 `store:false`、SSE，完整接收后转为客户非流式 JSON。成功用量与 New API 日志核对后记收益。续期在调用与读取模型时按需进行；失败不重试生成。撤销先清除本站凭据，再尝试官方撤销，未确认时应在官方设置结束该登录会话。
+Codex 上游使用 `chatgpt.com/backend-api/codex/responses`；备用注册应用授权使用公共 `/v1/responses`。两者均 `store:false`、SSE，完整接收后转为客户非流式 JSON。成功用量与 EonAI 计费网关 日志核对后记收益。续期在调用与读取模型时按需进行；失败不重试生成。撤销先清除本站凭据，再尝试官方撤销，未确认时应在官方设置结束该登录会话。
 
 ## 多厂商订阅的实际边界
 

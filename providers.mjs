@@ -1,5 +1,5 @@
 // One version for platform, node and the identity sent upstream; literals drifted apart before.
-export const supplyVersion='0.4.3';
+export const supplyVersion='0.4.4';
 // Fixed official destinations; the platform cannot inject an arbitrary URL.
 const chat='/v1/chat/completions',messages='/v1/messages',responses='/v1/responses';
 export const vendors=Object.assign(Object.create(null),{
